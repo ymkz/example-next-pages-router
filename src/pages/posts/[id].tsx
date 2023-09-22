@@ -7,10 +7,12 @@ import { getPost } from '~/repositories/posts'
 import type { Post } from '~/repositories/posts/type'
 import { getUser } from '~/repositories/users'
 import type { User } from '~/repositories/users/type'
+import { logger } from '~/utils/log'
 import { incrementAccessCount } from '~/utils/metrics'
 
 export const getServerSideProps = (async (context) => {
   incrementAccessCount('/posts/[id]', 'GET')
+  logger.info(`incoming /posts/${context.params?.id}`)
 
   const user = await getUser(1)
 

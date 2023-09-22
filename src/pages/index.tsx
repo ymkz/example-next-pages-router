@@ -5,10 +5,12 @@ import { Footer } from '~/components/footer'
 import { Header } from '~/components/header'
 import { getUser } from '~/repositories/users'
 import type { User } from '~/repositories/users/type'
+import { logger } from '~/utils/log'
 import { incrementAccessCount } from '~/utils/metrics'
 
 export const getServerSideProps = (async () => {
   incrementAccessCount('/', 'GET')
+  logger.info('incoming /')
 
   const user = await getUser(1)
 
