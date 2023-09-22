@@ -1,4 +1,5 @@
-import { User } from '~/repositories/users/type'
+import type { User } from '~/repositories/users/type'
+
 import style from './style.module.css'
 
 type Props = {

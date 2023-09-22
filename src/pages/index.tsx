@@ -1,12 +1,13 @@
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
+import type { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import Head from 'next/head'
+
 import { Footer } from '~/components/footer'
 import { Header } from '~/components/header'
 import { getUser } from '~/repositories/users'
-import { User } from '~/repositories/users/type'
+import type { User } from '~/repositories/users/type'
 import { incrementAccessCount } from '~/utils/metrics'
 
-export const getServerSideProps = (async (context) => {
+export const getServerSideProps = (async () => {
   incrementAccessCount('/', 'GET')
 
   const user = await getUser(1)
@@ -27,7 +28,7 @@ export default function Page({
     <>
       <Head>
         <title>サンプル</title>
-        <link rel="icon" href="/favicon.ico" />
+        <link href="/favicon.ico" rel="icon" />
       </Head>
       <>
         <Header user={user} />

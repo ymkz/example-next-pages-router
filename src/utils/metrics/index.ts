@@ -16,6 +16,6 @@ const errorCounter = meter.createCounter('error', {
   unit: 'counts',
   valueType: ValueType.INT,
 })
-export const incrementErrorCount = (errorCode: string = 'unknown') => {
+export const incrementErrorCount = (errorCode = 'unknown') => {
   errorCounter.add(1, { error_code: errorCode })
 }

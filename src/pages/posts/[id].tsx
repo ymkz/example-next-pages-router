@@ -1,11 +1,12 @@
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
+import type { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import Head from 'next/head'
+
 import { Footer } from '~/components/footer'
 import { Header } from '~/components/header'
 import { getPost } from '~/repositories/posts'
-import { Post } from '~/repositories/posts/type'
+import type { Post } from '~/repositories/posts/type'
 import { getUser } from '~/repositories/users'
-import { User } from '~/repositories/users/type'
+import type { User } from '~/repositories/users/type'
 import { incrementAccessCount } from '~/utils/metrics'
 
 export const getServerSideProps = (async (context) => {
@@ -29,8 +30,8 @@ export const getServerSideProps = (async (context) => {
 }) satisfies GetServerSideProps<{ user: User; post: Post }, { id: string }>
 
 export default function Page({
-  user,
   post,
+  user,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return (
     <>
