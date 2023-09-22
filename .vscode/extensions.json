@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "clinyong.vscode-css-modules",
+    "dbaeumer.vscode-eslint",
+    "EditorConfig.EditorConfig",
+    "esbenp.prettier-vscode",
+    "IronGeek.vscode-env",
+    "redhat.vscode-yaml",
+    "stylelint.vscode-stylelint"
+  ]
+}
