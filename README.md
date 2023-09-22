@@ -1,1 +1,1 @@
-# サンプル
+# example-next-pages-router
