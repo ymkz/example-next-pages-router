@@ -6,8 +6,11 @@ import { getPost } from '~/repositories/posts'
 import { Post } from '~/repositories/posts/type'
 import { getUser } from '~/repositories/users'
 import { User } from '~/repositories/users/type'
+import { incrementAccessCount } from '~/utils/metrics'
 
 export const getServerSideProps = (async (context) => {
+  incrementAccessCount('/posts/[id]', 'GET')
+
   const user = await getUser(1)
 
   if (!user) {

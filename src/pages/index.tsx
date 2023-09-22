@@ -4,8 +4,11 @@ import { Footer } from '~/components/footer'
 import { Header } from '~/components/header'
 import { getUser } from '~/repositories/users'
 import { User } from '~/repositories/users/type'
+import { incrementAccessCount } from '~/utils/metrics'
 
 export const getServerSideProps = (async (context) => {
+  incrementAccessCount('/', 'GET')
+
   const user = await getUser(1)
 
   if (!user) {
