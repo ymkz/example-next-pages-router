@@ -5,7 +5,7 @@
 import axios from 'axios'
 
 import { getPostStub, getPostsStub } from '~/repositories/posts/stub'
-import type { Post } from '~/repositories/posts/type'
+import type { CreatePostBody, Post } from '~/repositories/posts/type'
 import { logger } from '~/utils/log'
 import { incrementErrorCount } from '~/utils/metrics'
 
@@ -57,6 +57,26 @@ export const getPost = async (id: Post['id']): Promise<Post | undefined> => {
     incrementErrorCount('getPost.Fail')
     logger.error(err, `Postの取得に失敗しました id=${id}`)
     throw new Error(`Postの取得に失敗しました id=${id}`, {
+      cause: err,
+    })
+  }
+}
+
+export const createPost = async (body: CreatePostBody) => {
+  try {
+    const response = await axios.post<Post>(
+      `${process.env.JSONPLACEHOLDER_API_URL}/posts`,
+      body,
+      {
+        headers: { 'Content-Type': 'application/json' },
+        timeout: 3000,
+      },
+    )
+    return response.data
+  } catch (err) {
+    incrementErrorCount('createPost.Fail')
+    logger.error(err, `Postの作成に失敗しました`)
+    throw new Error(`Postの作成に失敗しました`, {
       cause: err,
     })
   }

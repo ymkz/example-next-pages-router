@@ -39,6 +39,18 @@ export default function Page({
       <>
         <Header user={user} />
         <main>
+          <form action="/api/create-post" method="POST">
+            <div>
+              <label>title: </label>
+              <input name="title" type="text" />
+            </div>
+            <div>
+              <label>body: </label>
+              <input name="body" type="text" />
+            </div>
+            <input name="userId" type="hidden" value={user.id} />
+            <button type="submit">作成</button>
+          </form>
           <ul>
             {posts.map((post) => (
               <li key={post.id}>
