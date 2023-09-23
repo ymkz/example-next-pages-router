@@ -12,13 +12,14 @@ const schema = z.object({
   userId: z.number(),
 })
 
-type Response = { ok: true; result: Post } | { ok: false; message: string }
+type Response = Post | { reason: string }
 
 export default async function route(
   req: NextApiRequest,
   res: NextApiResponse<Response>,
 ) {
   incrementAccessCount('/api/create-post', req.method!)
+  logger.info('incoming /api/create-post')
 
   if (req.method !== 'POST') {
     incrementErrorCount('api.create-post.MethodNotAllowed')
@@ -26,8 +27,7 @@ export default async function route(
       `/api/create-postに予期しないメソッドでリクエストされました method=${req.method}`,
     )
     return res.status(405).json({
-      ok: false,
-      message: 'Method Not Allowed',
+      reason: '不正なメソッドでのリクエストです',
     })
   }
 
@@ -36,31 +36,23 @@ export default async function route(
   if (!body.success) {
     incrementErrorCount('api.create-post.BadRequest')
     logger.error(
-      { issues: body.error.issues },
-      `/api/create-postに不正なボディでリクエストされました body=${JSON.stringify(
-        req.body,
-      )}`,
+      { request: req.body, issues: body.error.issues },
+      `/api/create-postに不正なボディでリクエストされました`,
     )
-    // FIXME: zodのerror.messageのフォーマット
     return res.status(400).json({
-      ok: false,
-      message: body.error.message,
+      // FIXME: バリデーションにひっかかった理由をレスポンスしたい
+      reason: '不正なボディでリクエストされました',
     })
   }
 
   try {
     const result = await createPost(body.data)
-
-    return res.status(200).json({
-      ok: true,
-      result,
-    })
+    return res.status(200).json(result)
   } catch (err) {
     incrementErrorCount('api.create-post.InternalServerError')
     logger.error(err, `/api/create-postでエラーが発生しました`)
     return res.status(500).json({
-      ok: false,
-      message: 'Internal Server Error',
+      reason: 'エラーが発生しました',
     })
   }
 }
