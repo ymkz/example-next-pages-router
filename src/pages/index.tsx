@@ -1,4 +1,4 @@
-import type { GetServerSideProps, InferGetServerSidePropsType } from 'next'
+import type { GetServerSideProps } from 'next'
 import Head from 'next/head'
 
 import { Footer } from '~/components/footer'
@@ -8,7 +8,9 @@ import type { User } from '~/repositories/users/type'
 import { logger } from '~/utils/log'
 import { incrementAccessCount } from '~/utils/metrics'
 
-export const getServerSideProps = (async () => {
+type Props = { user: User }
+
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
   incrementAccessCount('/', 'GET')
   logger.info('incoming /')
 
@@ -21,16 +23,13 @@ export const getServerSideProps = (async () => {
   }
 
   return { props: { user } }
-}) satisfies GetServerSideProps<{ user: User }>
+}
 
-export default function Page({
-  user,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function page({ user }: Props) {
   return (
     <>
       <Head>
         <title>サンプル</title>
-        <link href="/favicon.ico" rel="icon" />
       </Head>
       <>
         <Header user={user} />
@@ -44,6 +43,12 @@ export default function Page({
             </li>
             <li>
               <a href="/posts/9999">/posts/9999</a>
+            </li>
+            <li>
+              <a href="/test">/test</a>
+            </li>
+            <li>
+              <a href="/test?error=true">/test?error=true</a>
             </li>
           </ul>
         </main>

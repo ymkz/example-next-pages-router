@@ -1,4 +1,4 @@
-import type { GetServerSideProps, InferGetServerSidePropsType } from 'next'
+import type { GetServerSideProps } from 'next'
 import Head from 'next/head'
 
 import { Footer } from '~/components/footer'
@@ -10,7 +10,18 @@ import type { User } from '~/repositories/users/type'
 import { logger } from '~/utils/log'
 import { incrementAccessCount } from '~/utils/metrics'
 
-export const getServerSideProps = (async (context) => {
+type Params = {
+  id: string
+}
+
+type Props = {
+  user: User
+  post: Post
+}
+
+export const getServerSideProps: GetServerSideProps<Props, Params> = async (
+  context,
+) => {
   incrementAccessCount('/posts/[id]', 'GET')
   logger.info(`incoming /posts/${context.params?.id}`)
 
@@ -29,12 +40,9 @@ export const getServerSideProps = (async (context) => {
   }
 
   return { props: { user, post } }
-}) satisfies GetServerSideProps<{ user: User; post: Post }, { id: string }>
+}
 
-export default function Page({
-  post,
-  user,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function page({ post, user }: Props) {
   return (
     <>
       <Head>
