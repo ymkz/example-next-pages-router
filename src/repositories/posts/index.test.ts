@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios'
 import { describe, expect, test, vi } from 'vitest'
 
-import { getPost, getPosts } from '~/repositories/posts'
+import { createPost, getPost, getPosts } from '~/repositories/posts'
 
 describe(getPosts.name, () => {
   test('取得に成功した場合、レスポンスボディーを返す', async () => {
@@ -101,6 +101,72 @@ describe(getPost.name, () => {
     expect(spyAxiosGet).toHaveBeenCalledWith(
       `${process.env.JSONPLACEHOLDER_API_URL}/posts/0`,
       { timeout: 3000 },
+    )
+  })
+})
+
+describe(createPost.name, () => {
+  test('Postの作成に成功した場合、レスポンスを返す', async () => {
+    const spyAxiosPost = vi.spyOn(axios, 'post').mockResolvedValue({
+      data: {
+        userId: 1,
+        id: 101,
+        title: 'test_title',
+        body: 'test_body',
+      },
+    })
+
+    const actual = createPost({
+      title: 'test_title',
+      body: 'test_body',
+      userId: 1,
+    })
+
+    await expect(actual).resolves.toStrictEqual({
+      userId: 1,
+      id: 101,
+      title: 'test_title',
+      body: 'test_body',
+    })
+    expect(spyAxiosPost).toHaveBeenCalledTimes(1)
+    expect(spyAxiosPost).toHaveBeenCalledWith(
+      `${process.env.JSONPLACEHOLDER_API_URL}/posts`,
+      {
+        title: 'test_title',
+        body: 'test_body',
+        userId: 1,
+      },
+      {
+        headers: { 'Content-Type': 'application/json' },
+        timeout: 3000,
+      },
+    )
+  })
+
+  test('Postの作成に失敗した場合、例外をスローする', async () => {
+    const spyAxiosPost = vi
+      .spyOn(axios, 'post')
+      .mockRejectedValue(new AxiosError())
+
+    const actual = createPost({
+      title: 'test_title',
+      body: 'test_body',
+      userId: 1,
+    })
+
+    await expect(actual).rejects.toThrow('Postの作成に失敗しました')
+    expect(spyAxiosPost).toHaveBeenCalledTimes(1)
+    expect(spyAxiosPost).toHaveBeenCalledWith(
+      `${process.env.JSONPLACEHOLDER_API_URL}/posts`,
+      {
+        title: 'test_title',
+        body: 'test_body',
+        userId: 1,
+      },
+      {
+        headers: { 'Content-Type': 'application/json' },
+        timeout: 3000,
+      },
     )
   })
 })

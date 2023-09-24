@@ -76,6 +76,7 @@ export const createPost = async (body: CreatePostBody) => {
   } catch (err) {
     incrementErrorCount('createPost.Fail')
     logger.error(err, `Postの作成に失敗しました`)
+    // FIXME: APIからのエラーレスポンスをre-throwしたい
     throw new Error(`Postの作成に失敗しました`, {
       cause: err,
     })
