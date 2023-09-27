@@ -62,6 +62,9 @@ export default function page(props: Props) {
               <a href="/posts/9999">/posts/9999</a>
             </li>
             <li>
+              <a href="/notfound">/notfound</a>
+            </li>
+            <li>
               <a href="/error-survey?status=ok">/error-survey?status=ok</a>
             </li>
             <li>
