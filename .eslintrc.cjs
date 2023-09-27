@@ -13,7 +13,7 @@ module.exports = {
       node: true,
     },
   },
-  plugins: ['unused-imports', 'sort-destructure-keys'],
+  plugins: ['unused-imports'],
   rules: {
     '@next/next/no-html-link-for-pages': 'off',
     '@typescript-eslint/no-import-type-side-effects': 'error',
@@ -32,10 +32,6 @@ module.exports = {
         alphabetize: { order: 'asc' },
         pathGroups: [{ pattern: '~/**', group: 'external', position: 'after' }],
       },
-    ],
-    'sort-destructure-keys/sort-destructure-keys': [
-      'error',
-      { caseSensitive: false },
     ],
   },
   overrides: [
