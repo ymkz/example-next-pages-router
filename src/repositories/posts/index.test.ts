@@ -2,9 +2,10 @@ import axios, { AxiosError } from 'axios'
 import { describe, expect, test, vi } from 'vitest'
 
 import { createPost, getPost, getPosts } from '~/repositories/posts'
+import { AppError } from '~/utils/error'
 
 describe(getPosts.name, () => {
-  test('取得に成功した場合、レスポンスボディーを返す', async () => {
+  test('Post一覧の取得に成功した場合、レスポンスボディーを返す', async () => {
     const spyAxiosGet = vi.spyOn(axios, 'get').mockResolvedValue({
       data: [
         {
@@ -33,12 +34,14 @@ describe(getPosts.name, () => {
     )
   })
 
-  test('取得に失敗した場合、例外をスローする', async () => {
-    const spyAxiosGet = vi.spyOn(axios, 'get').mockRejectedValue(new Error())
+  test('Post一覧の取得に失敗した場合、AppErrorをスローする', async () => {
+    const spyAxiosGet = vi
+      .spyOn(axios, 'get')
+      .mockRejectedValue(new AxiosError())
 
     const actual = getPosts()
 
-    await expect(actual).rejects.toThrow('Post一覧の取得に失敗しました')
+    await expect(actual).rejects.toBeInstanceOf(AppError)
     expect(spyAxiosGet).toHaveBeenCalledTimes(1)
     expect(spyAxiosGet).toHaveBeenCalledWith(
       `${process.env.JSONPLACEHOLDER_API_URL}/posts?_start=0&_limit=10`,
@@ -48,7 +51,7 @@ describe(getPosts.name, () => {
 })
 
 describe(getPost.name, () => {
-  test('取得に成功した場合、レスポンスボディーを返す', async () => {
+  test('Postの取得に成功した場合、レスポンスのデータを返す', async () => {
     const spyAxiosGet = vi.spyOn(axios, 'get').mockResolvedValue({
       data: {
         userId: 0,
@@ -73,30 +76,14 @@ describe(getPost.name, () => {
     )
   })
 
-  test('存在しないidが渡された場合、undefinedが返却される', async () => {
-    const spyAxiosGet = vi.spyOn(axios, 'get').mockRejectedValue(
-      // @ts-ignore
-      new AxiosError('', '', '', '', { status: 404 }),
-    )
-
-    const actual = getPost(0)
-
-    await expect(actual).resolves.toBeUndefined()
-    expect(spyAxiosGet).toHaveBeenCalledTimes(1)
-    expect(spyAxiosGet).toHaveBeenCalledWith(
-      `${process.env.JSONPLACEHOLDER_API_URL}/posts/0`,
-      { timeout: 3000 },
-    )
-  })
-
-  test('取得に失敗した場合、例外をスローする', async () => {
+  test('Postの取得に失敗した場合、AppErrorをスローする', async () => {
     const spyAxiosGet = vi
       .spyOn(axios, 'get')
       .mockRejectedValue(new AxiosError())
 
     const actual = getPost(0)
 
-    await expect(actual).rejects.toThrow('Postの取得に失敗しました id=0')
+    await expect(actual).rejects.toBeInstanceOf(AppError)
     expect(spyAxiosGet).toHaveBeenCalledTimes(1)
     expect(spyAxiosGet).toHaveBeenCalledWith(
       `${process.env.JSONPLACEHOLDER_API_URL}/posts/0`,
@@ -106,7 +93,7 @@ describe(getPost.name, () => {
 })
 
 describe(createPost.name, () => {
-  test('Postの作成に成功した場合、レスポンスを返す', async () => {
+  test('Postの作成に成功した場合、レスポンスのデータを返す', async () => {
     const spyAxiosPost = vi.spyOn(axios, 'post').mockResolvedValue({
       data: {
         userId: 1,
@@ -143,7 +130,7 @@ describe(createPost.name, () => {
     )
   })
 
-  test('Postの作成に失敗した場合、例外をスローする', async () => {
+  test('Postの作成に失敗した場合、AppErrorをスローする', async () => {
     const spyAxiosPost = vi
       .spyOn(axios, 'post')
       .mockRejectedValue(new AxiosError())
@@ -154,7 +141,7 @@ describe(createPost.name, () => {
       userId: 1,
     })
 
-    await expect(actual).rejects.toThrow('Postの作成に失敗しました')
+    await expect(actual).rejects.toBeInstanceOf(AppError)
     expect(spyAxiosPost).toHaveBeenCalledTimes(1)
     expect(spyAxiosPost).toHaveBeenCalledWith(
       `${process.env.JSONPLACEHOLDER_API_URL}/posts`,

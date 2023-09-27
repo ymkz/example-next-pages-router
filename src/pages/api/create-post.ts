@@ -9,7 +9,7 @@ import { incrementAccessCount, incrementErrorCount } from '~/utils/metrics'
 const schema = z.object({
   title: z.string().nonempty(),
   body: z.string().nonempty(),
-  userId: z.number(),
+  userId: z.coerce.number(),
 })
 
 type Response = Post | { reason: string }
@@ -19,7 +19,7 @@ export default async function route(
   res: NextApiResponse<Response>,
 ) {
   incrementAccessCount('/api/create-post', req.method!)
-  logger.info('incoming /api/create-post')
+  logger.info('incoming request to /api/create-post')
 
   if (req.method !== 'POST') {
     incrementErrorCount('api.create-post.MethodNotAllowed')
