@@ -19,7 +19,7 @@ export default async function route(
   res: NextApiResponse<Response>,
 ) {
   incrementAccessCount('/api/create-post', req.method!)
-  logger.info('incoming request to /api/create-post')
+  logger.info('request incoming to /api/create-post')
 
   if (req.method !== 'POST') {
     incrementErrorCount('api.create-post.MethodNotAllowed')
@@ -46,13 +46,19 @@ export default async function route(
   }
 
   try {
-    const result = await createPost(body.data)
+    const [result, error] = await createPost(body.data)
+
+    if (error) {
+      return res
+        .status(error.status)
+        .json({ reason: 'Post作成APIリクエストでエラーが発生しました' })
+    }
+
     return res.status(200).json(result)
   } catch (err) {
     incrementErrorCount('api.create-post.InternalServerError')
     logger.error(err, `/api/create-postでエラーが発生しました`)
-    return res.status(500).json({
-      reason: 'エラーが発生しました',
-    })
+
+    return res.status(500).json({ reason: 'エラーが発生しました' })
   }
 }

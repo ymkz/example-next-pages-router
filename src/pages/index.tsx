@@ -1,35 +1,28 @@
 import type { GetServerSideProps } from 'next'
 import Head from 'next/head'
 
-import { ErrorRender } from '~/components/error'
 import { Footer } from '~/components/footer'
 import { Header } from '~/components/header'
 import { getUser } from '~/repositories/users'
 import type { User } from '~/repositories/users/type'
-import type { AppErrorSerialized } from '~/utils/error'
 import { logger } from '~/utils/log'
 import { incrementAccessCount } from '~/utils/metrics'
 
-type Props =
-  | {
-      status: 'ok'
-      user: User
-    }
-  | {
-      status: 'error'
-      error: AppErrorSerialized
-    }
+type Props = {
+  status: 'ok'
+  user: User
+}
 
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
+export const getServerSideProps: GetServerSideProps<Props> = async (
+  context,
+) => {
   incrementAccessCount('/', 'GET')
-  logger.info('incoming request to /')
+  logger.info(`request incoming to ${context.resolvedUrl}`)
 
-  let user: User
+  const [user, error] = await getUser()
 
-  try {
-    user = await getUser(1)
-  } catch (err) {
-    logger.info('未認証のためログインページへリダイレクト')
+  if (error) {
+    logger.warn('未認証のためログインページへリダイレクト')
     return {
       redirect: { destination: '/', permanent: false },
     }
@@ -39,14 +32,10 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
 }
 
 export default function page(props: Props) {
-  if (props.status === 'error') {
-    return <ErrorRender {...props.error} />
-  }
-
   return (
     <>
       <Head>
-        <title>サンプル</title>
+        <title>タイトル</title>
       </Head>
       <>
         <Header user={props.user} />
@@ -65,11 +54,14 @@ export default function page(props: Props) {
               <a href="/notfound">/notfound</a>
             </li>
             <li>
-              <a href="/error-survey?status=ok">/error-survey?status=ok</a>
+              <a href="/error-check?status=ok">/error-check?status=ok</a>
             </li>
             <li>
-              <a href="/error-survey?status=error">
-                /error-survey?status=error
+              <a href="/error-check?status=error">/error-check?status=error</a>
+            </li>
+            <li>
+              <a href="/error-check?status=exception">
+                /error-check?status=exception
               </a>
             </li>
           </ul>

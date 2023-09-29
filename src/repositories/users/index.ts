@@ -2,40 +2,39 @@
  * @see https://jsonplaceholder.typicode.com/guide/
  */
 
-import type { AxiosRequestConfig } from 'axios'
-import axios, { AxiosError } from 'axios'
-
 import { getUserStub } from '~/repositories/users/stub'
 import type { User } from '~/repositories/users/type'
-import { AppError } from '~/utils/error'
+import type { Result } from '~/utils/error'
 import { logger } from '~/utils/log'
 import { incrementErrorCount } from '~/utils/metrics'
 
-export const getUser = async (id: User['id']): Promise<User> => {
+export const getUser = async (): Promise<Result<User>> => {
   if (process.env.USE_STUB === 'true') {
-    return getUserStub()
+    const stub = getUserStub()
+    return [stub, null]
   }
 
-  const url = `${process.env.JSONPLACEHOLDER_API_URL}/users/${id}`
-  const config: AxiosRequestConfig = { timeout: 3000 }
-
   try {
-    const response = await axios.get<User>(url, config)
-    return response.data
-  } catch (err) {
-    incrementErrorCount('getUser.Fail')
-    logger.error(err, `Userの取得に失敗しました id=${id}`)
+    const response = await fetch(
+      `${process.env.JSONPLACEHOLDER_API_URL}/users/1`,
+      { method: 'GET' },
+    )
 
-    if (err instanceof AxiosError) {
-      throw new AppError({
-        message: `Userの取得に失敗しました id=${id}`,
-        status: err.response?.status ?? 500,
-        url,
-      })
+    if (!response.ok) {
+      const data = await response.json()
+
+      incrementErrorCount('repositories.users.getUser.error')
+      logger.error(data, `Userの取得に失敗しました`)
+
+      return [null, { status: response.status, data }]
     }
 
-    throw new Error(`Userの取得に失敗しました id=${id}`, {
-      cause: err,
-    })
+    const data = await response.json()
+    return [data, null]
+  } catch (err) {
+    incrementErrorCount('repositories.users.getUser.exception')
+    logger.error(err, `Userの取得で例外が発生しました`)
+
+    return [null, { status: 500 }]
   }
 }

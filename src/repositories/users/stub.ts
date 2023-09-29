@@ -1,6 +1,6 @@
 import type { User } from '~/repositories/users/type'
 
-export const getUserStub = async (): Promise<User> => {
+export const getUserStub = (): User => {
   return {
     id: 1,
     name: 'stub_name',

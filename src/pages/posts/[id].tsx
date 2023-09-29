@@ -1,14 +1,14 @@
 import type { GetServerSideProps } from 'next'
 import Head from 'next/head'
 
-import { ErrorRender } from '~/components/error'
+import { ErrorRender } from '~/components/error-render'
 import { Footer } from '~/components/footer'
 import { Header } from '~/components/header'
 import { getPost } from '~/repositories/posts'
 import type { Post } from '~/repositories/posts/type'
 import { getUser } from '~/repositories/users'
 import type { User } from '~/repositories/users/type'
-import { AppError, type AppErrorSerialized } from '~/utils/error'
+import type { Failure } from '~/utils/error'
 import { logger } from '~/utils/log'
 import { incrementAccessCount } from '~/utils/metrics'
 
@@ -24,36 +24,31 @@ type Props =
     }
   | {
       status: 'error'
-      error: AppErrorSerialized
+      error: Failure
     }
 
 export const getServerSideProps: GetServerSideProps<Props, Params> = async (
   context,
 ) => {
   incrementAccessCount('/posts/[id]', 'GET')
-  logger.info(`incoming request to /posts/${context.params?.id}`)
+  logger.info(`request incoming to ${context.resolvedUrl}`)
 
-  let user: User
+  const [user, userError] = await getUser()
 
-  try {
-    user = await getUser(1)
-  } catch (err) {
-    logger.info('未認証のためログインページへリダイレクト')
+  if (userError) {
+    logger.warn('未認証のためログインページへリダイレクト')
     return {
       redirect: { destination: '/', permanent: false },
     }
   }
 
-  try {
-    const post = await getPost(Number(context.params?.id))
-    return { props: { status: 'ok', user, post } }
-  } catch (err) {
-    if (err instanceof AppError) {
-      context.res.statusCode = err.status
-      return { props: { status: 'error', error: err.serialize() } }
-    }
-    throw err // render 500.tsx
+  const [post, postError] = await getPost(Number(context.params?.id))
+  if (postError) {
+    context.res.statusCode = postError.status
+    return { props: { status: 'error', error: postError } }
   }
+
+  return { props: { status: 'ok', user, post } }
 }
 
 export default function page(props: Props) {
@@ -64,7 +59,7 @@ export default function page(props: Props) {
   return (
     <>
       <Head>
-        <title>Post - サンプル</title>
+        <title>Post - タイトル</title>
       </Head>
       <>
         <Header user={props.user} />

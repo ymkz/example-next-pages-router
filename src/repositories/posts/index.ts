@@ -2,105 +2,107 @@
  * @see https://jsonplaceholder.typicode.com/guide/
  */
 
-import type { AxiosRequestConfig } from 'axios'
-import axios, { AxiosError } from 'axios'
-
 import {
   createPostStub,
   getPostStub,
   getPostsStub,
 } from '~/repositories/posts/stub'
 import type { CreatePostBody, Post } from '~/repositories/posts/type'
-import { AppError } from '~/utils/error'
+import type { Result } from '~/utils/error'
 import { logger } from '~/utils/log'
 import { incrementErrorCount } from '~/utils/metrics'
 
-export const getPosts = async (): Promise<Post[]> => {
+export const getPosts = async (): Promise<Result<Post[]>> => {
   if (process.env.USE_STUB === 'true') {
-    return getPostsStub()
+    const stub = getPostsStub()
+    return [stub, null]
   }
 
-  const url = `${process.env.JSONPLACEHOLDER_API_URL}/posts?_start=0&_limit=10`
-  const config: AxiosRequestConfig = { timeout: 3000 }
-
   try {
-    const response = await axios.get<Post[]>(url, config)
-    return response.data
-  } catch (err) {
-    incrementErrorCount('getPosts.Fail')
-    logger.error(err, `Post一覧の取得に失敗しました`)
+    const response = await fetch(
+      `${process.env.JSONPLACEHOLDER_API_URL}/posts?_start=0&_limit=10`,
+      { method: 'GET' },
+    )
 
-    if (err instanceof AxiosError) {
-      throw new AppError({
-        message: `Post一覧の取得に失敗しました`,
-        status: err.response?.status ?? 500,
-        url,
-      })
+    if (!response.ok) {
+      const data = await response.json()
+
+      incrementErrorCount('repositories.posts.getPosts.error')
+      logger.error(data, `Post一覧の取得に失敗しました`)
+
+      return [null, { status: response.status, data }]
     }
 
-    throw new Error(`Post一覧の取得に失敗しました`, {
-      cause: err,
-    })
+    const data = await response.json()
+    return [data, null]
+  } catch (err) {
+    incrementErrorCount('repositories.posts.getPosts.exception')
+    logger.error(err, `Post一覧の取得で例外が発生しました`)
+
+    return [null, { status: 500 }]
   }
 }
 
-export const getPost = async (id: Post['id']): Promise<Post> => {
+export const getPost = async (id: Post['id']): Promise<Result<Post>> => {
   if (process.env.USE_STUB === 'true') {
-    return getPostStub()
+    const stub = getPostStub()
+    return [stub, null]
   }
 
-  const url = `${process.env.JSONPLACEHOLDER_API_URL}/posts/${id}`
-  const config: AxiosRequestConfig = { timeout: 3000 }
-
   try {
-    const response = await axios.get<Post>(url, config)
-    return response.data
-  } catch (err) {
-    incrementErrorCount('getPost.Fail')
-    logger.error(err, `Postの取得に失敗しました id=${id}`)
+    const response = await fetch(
+      `${process.env.JSONPLACEHOLDER_API_URL}/posts/${id}`,
+      { method: 'GET' },
+    )
 
-    if (err instanceof AxiosError) {
-      throw new AppError({
-        message: `Postの取得に失敗しました id=${id}`,
-        status: err.response?.status ?? 500,
-        url,
-      })
+    if (!response.ok) {
+      const data = await response.json()
+
+      incrementErrorCount('repositories.posts.getPost.error')
+      logger.error(data, `Postの取得に失敗しました id=${id}`)
+
+      return [null, { status: response.status, data }]
     }
 
-    throw new Error(`Postの取得に失敗しました id=${id}`, {
-      cause: err,
-    })
+    const data = await response.json()
+    return [data, null]
+  } catch (err) {
+    incrementErrorCount('repositories.posts.getPost.exception')
+    logger.error(err, `Postの取得で例外が発生しました id=${id}`)
+
+    return [null, { status: 500 }]
   }
 }
 
-export const createPost = async (body: CreatePostBody) => {
+export const createPost = async (
+  body: CreatePostBody,
+): Promise<Result<Post>> => {
   if (process.env.USE_STUB === 'true') {
-    return createPostStub(body)
-  }
-
-  const url = `${process.env.JSONPLACEHOLDER_API_URL}/posts`
-  const config: AxiosRequestConfig = {
-    headers: { 'Content-Type': 'application/json' },
-    timeout: 3000,
+    const stub = createPostStub(body)
+    return [stub, null]
   }
 
   try {
-    const response = await axios.post<Post>(url, body, config)
-    return response.data
-  } catch (err) {
-    incrementErrorCount('createPost.Fail')
-    logger.error(err, `Postの作成に失敗しました`)
+    const response = await fetch(
+      `${process.env.JSONPLACEHOLDER_API_URL}/posts`,
+      { method: 'POST', body: JSON.stringify(body) },
+    )
 
-    if (err instanceof AxiosError) {
-      throw new AppError({
-        message: `Postの作成に失敗しました`,
-        status: err.response?.status ?? 500,
-        url,
-      })
+    if (!response.ok) {
+      const data = await response.json()
+
+      incrementErrorCount('repositories.posts.createPost.error')
+      logger.error(data, `Postの作成に失敗しました`)
+
+      return [null, { status: response.status, data }]
     }
 
-    throw new Error(`Postの作成に失敗しました`, {
-      cause: err,
-    })
+    const data = await response.json()
+    return [data, null]
+  } catch (err) {
+    incrementErrorCount('repositories.posts.createPost.exception')
+    logger.error(err, `Postの作成で例外が発生しました`)
+
+    return [null, { status: 500 }]
   }
 }

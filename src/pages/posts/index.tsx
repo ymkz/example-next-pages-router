@@ -1,15 +1,14 @@
 import type { GetServerSideProps } from 'next'
 import Head from 'next/head'
 
-import { ErrorRender } from '~/components/error'
+import { ErrorRender } from '~/components/error-render'
 import { Footer } from '~/components/footer'
 import { Header } from '~/components/header'
 import { getPosts } from '~/repositories/posts'
 import type { Post } from '~/repositories/posts/type'
 import { getUser } from '~/repositories/users'
 import type { User } from '~/repositories/users/type'
-import type { AppErrorSerialized } from '~/utils/error'
-import { AppError } from '~/utils/error'
+import type { Failure } from '~/utils/error'
 import { logger } from '~/utils/log'
 import { incrementAccessCount } from '~/utils/metrics'
 
@@ -21,36 +20,31 @@ type Props =
     }
   | {
       status: 'error'
-      error: AppErrorSerialized
+      error: Failure
     }
 
 export const getServerSideProps: GetServerSideProps<Props> = async (
   context,
 ) => {
   incrementAccessCount('/posts', 'GET')
-  logger.info('incoming request to /posts')
+  logger.info(`request incoming to ${context.resolvedUrl}`)
 
-  let user: User
+  const [user, userError] = await getUser()
 
-  try {
-    user = await getUser(1)
-  } catch (err) {
-    logger.info('未認証のためログインページへリダイレクト')
+  if (userError) {
+    logger.warn('未認証のためログインページへリダイレクト')
     return {
       redirect: { destination: '/', permanent: false },
     }
   }
 
-  try {
-    const posts = await getPosts()
-    return { props: { status: 'ok', user, posts } }
-  } catch (err) {
-    if (err instanceof AppError) {
-      context.res.statusCode = err.status
-      return { props: { status: 'error', error: err.serialize() } }
-    }
-    throw err // render 500.tsx
+  const [posts, postsError] = await getPosts()
+  if (postsError) {
+    context.res.statusCode = postsError.status
+    return { props: { status: 'error', error: postsError } }
   }
+
+  return { props: { status: 'ok', user, posts } }
 }
 
 export default function page(props: Props) {
@@ -61,7 +55,7 @@ export default function page(props: Props) {
   return (
     <>
       <Head>
-        <title>Posts - サンプル</title>
+        <title>Posts - タイトル</title>
       </Head>
       <>
         <Header user={props.user} />
