@@ -1,5 +1,9 @@
 {
+  "name": "example-next-pages-router",
   "private": true,
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -16,26 +20,26 @@
     "@opentelemetry/sdk-metrics": "1.17.0",
     "@opentelemetry/sdk-node": "0.43.0",
     "dayjs": "1.11.10",
-    "next": "13.5.2",
-    "pino": "8.15.1",
+    "next": "13.5.4",
+    "pino": "8.15.6",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "zod": "3.22.2"
+    "zod": "3.22.4"
   },
   "devDependencies": {
-    "@types/node": "20.6.3",
-    "@types/react": "18.2.22",
-    "@types/react-dom": "18.2.7",
-    "@typescript-eslint/eslint-plugin": "6.7.2",
-    "@typescript-eslint/parser": "6.7.2",
-    "eslint": "8.49.0",
-    "eslint-config-next": "13.5.2",
+    "@types/node": "20.8.2",
+    "@types/react": "18.2.25",
+    "@types/react-dom": "18.2.10",
+    "@typescript-eslint/eslint-plugin": "6.7.4",
+    "@typescript-eslint/parser": "6.7.4",
+    "eslint": "8.50.0",
+    "eslint-config-next": "13.5.4",
     "eslint-config-prettier": "9.0.0",
     "eslint-import-resolver-typescript": "3.6.1",
     "eslint-plugin-import": "2.28.1",
     "eslint-plugin-unused-imports": "3.0.0",
     "prettier": "3.0.3",
     "typescript": "5.2.2",
-    "vitest": "0.34.5"
+    "vitest": "0.34.6"
   }
 }

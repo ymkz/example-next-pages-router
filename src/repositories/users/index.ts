@@ -6,7 +6,7 @@ import { getUserStub } from '~/repositories/users/stub'
 import type { User } from '~/repositories/users/type'
 import type { Result } from '~/utils/error'
 import { logger } from '~/utils/log'
-import { incrementErrorCount } from '~/utils/metrics'
+import { incrementErrorCount } from '~/utils/metric'
 
 export const getUser = async (): Promise<Result<User>> => {
   if (process.env.USE_STUB === 'true') {

@@ -10,7 +10,7 @@ import {
 import type { CreatePostBody, Post } from '~/repositories/posts/type'
 import type { Result } from '~/utils/error'
 import { logger } from '~/utils/log'
-import { incrementErrorCount } from '~/utils/metrics'
+import { incrementErrorCount } from '~/utils/metric'
 
 export const getPosts = async (): Promise<Result<Post[]>> => {
   if (process.env.USE_STUB === 'true') {

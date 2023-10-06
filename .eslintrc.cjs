@@ -4,6 +4,8 @@ module.exports = {
   extends: [
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/stylistic',
+    'plugin:import/recommended',
+    'plugin:import/typescript',
     'next/core-web-vitals',
     'prettier',
   ],
@@ -22,9 +24,6 @@ module.exports = {
       'error',
       { prefer: 'type-imports' },
     ],
-    'react/jsx-sort-props': ['error', { callbacksLast: true }],
-    'unused-imports/no-unused-imports': 'error',
-    'import/newline-after-import': 'error',
     'import/order': [
       'error',
       {
@@ -33,6 +32,9 @@ module.exports = {
         pathGroups: [{ pattern: '~/**', group: 'external', position: 'after' }],
       },
     ],
+    'import/newline-after-import': 'error',
+    'unused-imports/no-unused-imports': 'error',
+    'react/jsx-sort-props': ['error', { callbacksLast: true }],
   },
   overrides: [
     {

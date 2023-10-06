@@ -3,7 +3,6 @@ import type { GetServerSideProps } from 'next'
 import { ErrorRender } from '~/components/error-render'
 import type { Failure } from '~/utils/error'
 import { logger } from '~/utils/log'
-import { incrementAccessCount } from '~/utils/metrics'
 
 type Props =
   | {
@@ -17,7 +16,6 @@ type Props =
 export const getServerSideProps: GetServerSideProps<Props> = async (
   context,
 ) => {
-  incrementAccessCount('/error-check', 'GET')
   logger.info(`request incoming to ${context.resolvedUrl}`)
 
   if (context.query.status === 'error') {

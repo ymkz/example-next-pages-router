@@ -10,7 +10,6 @@ import { getUser } from '~/repositories/users'
 import type { User } from '~/repositories/users/type'
 import type { Failure } from '~/utils/error'
 import { logger } from '~/utils/log'
-import { incrementAccessCount } from '~/utils/metrics'
 
 type Params = {
   id: string
@@ -30,7 +29,6 @@ type Props =
 export const getServerSideProps: GetServerSideProps<Props, Params> = async (
   context,
 ) => {
-  incrementAccessCount('/posts/[id]', 'GET')
   logger.info(`request incoming to ${context.resolvedUrl}`)
 
   const [user, userError] = await getUser()

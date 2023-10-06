@@ -6,7 +6,6 @@ import { Header } from '~/components/header'
 import { getUser } from '~/repositories/users'
 import type { User } from '~/repositories/users/type'
 import { logger } from '~/utils/log'
-import { incrementAccessCount } from '~/utils/metrics'
 
 type Props = {
   status: 'ok'
@@ -16,7 +15,6 @@ type Props = {
 export const getServerSideProps: GetServerSideProps<Props> = async (
   context,
 ) => {
-  incrementAccessCount('/', 'GET')
   logger.info(`request incoming to ${context.resolvedUrl}`)
 
   const [user, error] = await getUser()

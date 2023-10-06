@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { createPost } from '~/repositories/posts'
 import type { Post } from '~/repositories/posts/type'
 import { logger } from '~/utils/log'
-import { incrementAccessCount, incrementErrorCount } from '~/utils/metrics'
+import { incrementErrorCount } from '~/utils/metric'
 
 const schema = z.object({
   title: z.string().nonempty(),
@@ -18,7 +18,6 @@ export default async function route(
   req: NextApiRequest,
   res: NextApiResponse<Response>,
 ) {
-  incrementAccessCount('/api/create-post', req.method!)
   logger.info('request incoming to /api/create-post')
 
   if (req.method !== 'POST') {
