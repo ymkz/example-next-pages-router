@@ -4,11 +4,11 @@ import { z } from 'zod'
 import { createPost } from '~/repositories/posts'
 import type { Post } from '~/repositories/posts/type'
 import { logger } from '~/utils/log'
-import { incrementErrorCount } from '~/utils/metric'
+import { incrementErrorCount, incrementWarnCount } from '~/utils/metric'
 
 const schema = z.object({
-  title: z.string().nonempty(),
-  body: z.string().nonempty(),
+  title: z.string().min(1),
+  body: z.string().min(1),
   userId: z.coerce.number(),
 })
 
@@ -18,11 +18,9 @@ export default async function route(
   req: NextApiRequest,
   res: NextApiResponse<Response>,
 ) {
-  logger.info('request incoming to /api/create-post')
-
   if (req.method !== 'POST') {
-    incrementErrorCount('api.create-post.MethodNotAllowed')
-    logger.error(
+    incrementWarnCount('api.create-post.MethodNotAllowed')
+    logger.warn(
       `/api/create-postに予期しないメソッドでリクエストされました method=${req.method}`,
     )
     return res.status(405).json({
@@ -33,8 +31,8 @@ export default async function route(
   const body = schema.safeParse(req.body)
 
   if (!body.success) {
-    incrementErrorCount('api.create-post.BadRequest')
-    logger.error(
+    incrementWarnCount('api.create-post.BadRequest')
+    logger.warn(
       { request: req.body, issues: body.error.issues },
       `/api/create-postに不正なボディでリクエストされました`,
     )

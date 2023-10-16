@@ -2,7 +2,6 @@ import type { GetServerSideProps } from 'next'
 
 import { ErrorRender } from '~/components/error-render'
 import type { Failure } from '~/utils/error'
-import { logger } from '~/utils/log'
 
 type Props =
   | {
@@ -16,8 +15,6 @@ type Props =
 export const getServerSideProps: GetServerSideProps<Props> = async (
   context,
 ) => {
-  logger.info(`request incoming to ${context.resolvedUrl}`)
-
   if (context.query.status === 'error') {
     context.res.statusCode = 500
     return { props: { status: 'error', error: { status: 500 } } }

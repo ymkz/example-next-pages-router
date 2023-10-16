@@ -1,6 +1,6 @@
 import { pino } from 'pino'
 
-const timestamp = () => {
+export const timestamp = () => {
   const iso8601 = new Intl.DateTimeFormat('ja-JP', {
     year: 'numeric',
     month: '2-digit',

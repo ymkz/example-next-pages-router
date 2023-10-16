@@ -12,24 +12,20 @@ type Props = {
   user: User
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async (
-  context,
-) => {
-  logger.info(`request incoming to ${context.resolvedUrl}`)
-
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
   const [user, error] = await getUser()
 
   if (error) {
     logger.warn('未認証のためログインページへリダイレクト')
     return {
-      redirect: { destination: '/', permanent: false },
+      redirect: { destination: 'https://example.com', permanent: false },
     }
   }
 
   return { props: { status: 'ok', user } }
 }
 
-export default function page(props: Props) {
+export default function Page(props: Props) {
   return (
     <>
       <Head>
@@ -52,14 +48,14 @@ export default function page(props: Props) {
               <a href="/notfound">/notfound</a>
             </li>
             <li>
-              <a href="/error-check?status=ok">/error-check?status=ok</a>
+              <a href="/debug/error?status=ok">/debug/error?status=ok</a>
             </li>
             <li>
-              <a href="/error-check?status=error">/error-check?status=error</a>
+              <a href="/debug/error?status=error">/debug/error?status=error</a>
             </li>
             <li>
-              <a href="/error-check?status=exception">
-                /error-check?status=exception
+              <a href="/debug/error?status=exception">
+                /debug/error?status=exception
               </a>
             </li>
           </ul>

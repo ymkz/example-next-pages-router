@@ -7,6 +7,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return { props: {} }
 }
 
-export default function page() {
+export default function Page() {
   return null
 }

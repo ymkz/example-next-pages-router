@@ -25,14 +25,12 @@ type Props =
 export const getServerSideProps: GetServerSideProps<Props> = async (
   context,
 ) => {
-  logger.info(`request incoming to ${context.resolvedUrl}`)
-
   const [user, userError] = await getUser()
 
   if (userError) {
     logger.warn('未認証のためログインページへリダイレクト')
     return {
-      redirect: { destination: '/', permanent: false },
+      redirect: { destination: 'https://example.com', permanent: false },
     }
   }
 
@@ -45,7 +43,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
   return { props: { status: 'ok', user, posts } }
 }
 
-export default function page(props: Props) {
+export default function Page(props: Props) {
   if (props.status === 'error') {
     return <ErrorRender {...props.error} />
   }

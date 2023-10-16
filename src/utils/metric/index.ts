@@ -1,9 +1,9 @@
 import { metrics, ValueType } from '@opentelemetry/api'
 
-const meter = metrics.getMeter('')
+const meter = metrics.getMeter('default')
 
 const accessCounter = meter.createCounter('access', {
-  description: 'Count number of access by page',
+  description: 'Count number of access by page and method',
   unit: 'counts',
   valueType: ValueType.INT,
 })
@@ -16,6 +16,15 @@ const errorCounter = meter.createCounter('error', {
   unit: 'counts',
   valueType: ValueType.INT,
 })
-export const incrementErrorCount = (errorCode = 'unknown') => {
+export const incrementErrorCount = (errorCode = 'other') => {
   errorCounter.add(1, { error_code: errorCode })
+}
+
+const warnCounter = meter.createCounter('warn', {
+  description: 'Count number of warn by warn_code',
+  unit: 'counts',
+  valueType: ValueType.INT,
+})
+export const incrementWarnCount = (warnCode = 'other') => {
+  warnCounter.add(1, { warn_code: warnCode })
 }

@@ -1,11 +1,8 @@
-/node_modules
-/coverage
-/.next/
-/out/
-/build
-.DS_Store
-npm-debug.log*
-.env*.local
+.next
 .vercel
+coverage
+node_modules
+.DS_Store
+.env*.local
+npm-debug.log*
 *.tsbuildinfo
-next-env.d.ts
