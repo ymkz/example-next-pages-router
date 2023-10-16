@@ -9,7 +9,7 @@
     "build": "next build",
     "start": "node .next/standalone/server.js",
     "lint": "tsc --noEmit && prettier . --check && next lint",
-    "lint:fix": "prettier . --write && next lint --fix",
+    "lint:fix": "tsc && prettier . --write && next lint --fix",
     "test": "vitest run"
   },
   "dependencies": {
